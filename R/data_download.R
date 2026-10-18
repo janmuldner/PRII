@@ -1,37 +1,41 @@
-### PRII - Data download and preaparation script - R ###
+### PRII - Data download script - R ###
 # Jan Müldner
 # Wageningen University & Research
 # 2026/2027
-# # PRII directory must be set as working directory
+# # PRII to be set as working directory
 
-# Load necessary libraries
+# NOTES:
+  #
 
-
-# Define variables for directories
-data_dir <- "data"
-output_dir <- "output"
+# Load libraries
+library(terra)
+library(sf)
 
 # Prepare directories
-if (!dir.exists(data_dir)){
-  dir.create(data_dir)
+if (!dir.exists("data")){
+  dir.create("data")
 }
 
-if (!dir.exists(output_dir)){
-  dir.create(output_dir)
+if (!dir.exists("output")){
+  dir.create("output")
 }
 
 
-## Define variables for the URLs of datasets used ##
-# All data are refferred in the data_sources.md file present in the main repository branch
+## Define variables for the URLs of datasets used ##  (see data_sources.md for references)
 
-# URL for the Recent road expansion dataset
-RRE_url <- 
-
-#URL for the IUCN Red List terrestrial mammals dataset
+# Recent road expansion dataset
+RRE_url <- "https://zenodo.org/records/20201702/files/forestroads_afr_2019-01_2025-12.zip?download=1"
+# IUCN Red List terrestrial mammals dataset
 IUCNRL_url <- 
-
-# URL for the Area of Habitat mammals dataset (might have to be split up into multiple)
+# Area of Habitat mammals dataset (might have to be split up into multiple)
 AOH_url <- 
-
-# URL for the Intact Forest Landscapes dataset
+# Intact Forest Landscapes dataset
 IFL_url <-
+
+
+## Download to data directory ##
+  
+# Recent road expansion dataset (as .shp and .gejson, .shp seems to be much faster in further processing)
+download.file(url = RRE_url, destfile = "data/road_expansion.zip", method = "libcurl", mode = "wb") # method for granting permission from website, mode for binary handling (since it is a .zip file)
+unzip("data/road_expansion.zip", exdir = "data")
+file.remove("data/road_expansion.zip")
