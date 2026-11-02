@@ -22,10 +22,6 @@ if (!dir.exists("output")){
 }
 
 
-# ---- Define main CRS for study as global variable ----
-study_crs <- "ESRI:54009"
-
-
 
 
 # ---- Define URLs of datasets through a named list----
@@ -44,13 +40,14 @@ dataset_urls <- list(
 )
 
 
-# ---- Function to download the data using the named list ----
+# ---- Function to download the data using the named list and ROI ----
+# automate it so that it downloads for ROI
 download.datasets <- function(dataset_name, destfile, exdir) {
 
 # avoid downloading twice by checking if the desired directory exists (this could also be improved by adding a final_file as a means of checking to prevent empty exdirs being taken as successful downlaod)
   if (!dir.exists(exdir)) {
 
-    download.file(url=dataset_urls[[dataset_name]], # takes in url from dataset_urls
+    download.file(url=dataset_urls[[dataset_name]], # takes in url from dataset_urls upon calling name of dataset (see names(dataset_urls))
       destfile = destfile, 
       method = "libcurl", # granting permission from websites
       mode = "wb") # binary handling (mostly for .zip files)
@@ -61,18 +58,21 @@ download.datasets <- function(dataset_name, destfile, exdir) {
   }
 }
 
-# Calling the function to download individual datasets
-  # see names(dataset_urls) for available inputs
 
-# Obtaining the recent road expansion dataset (RRE)
+
+# ---- Downloading all individual datasets using download.datasets() ----
+  # Unfortunately, this cannot be done per ROI right away, this means that the entire datasets must be acquired in this step
+
+# Road expansion dataset (RRE)
   # Downloads both .shp and .gjson (.shp seems to be faster for processing)
 download.datasets("RRE", "data/rre.zip", "data/road_expansion")
 
-# Obtaining the IUCN Red List terrestrial mammals dataset (IUCN_RL)
+# IUCN Red List terrestrial mammals dataset (IUCN_RL)
+  # All years will be obtained
 
-# Obtaining the Intact Forest Landscapes dataset (IFL)
+# Intact Forest Landscapes dataset (IFL)
 
-# Obtaining the Area of Habitat mammals dataset 
+# Area of Habitat mammals dataset 
   # (might have to be split up into multiple steps)
   # writeRaster() could be useful here to write it directly to disk
 

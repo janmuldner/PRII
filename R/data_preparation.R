@@ -2,15 +2,12 @@
 # Jan Müldner
 # Wageningen University & Research
 # 2026/2027
-# PRII directory to be set as working directory
+# PRII to be set as working directory
 
 # Load packages
 library(sf)
 library(terra)
 library(rnaturalearth)
-
-# Read in datasets as (global) variables
-recent_roads <- st_read("data/road_expansion/forestroads_afr_2019-01_2025-12.shp")
 
 
 
@@ -64,4 +61,19 @@ save_roi <- function(roi) {
   # This function will save the geometry of the ROI to disk (data) since it will be used throughout the study
 
   st_write(roi, "intermediate/ROI.gpkg", driver = "GPKG", delete_dsn = TRUE)
+}
+
+# Run the function and have it create a global variable for the ROI (will be used repeatedly)
+ROI <- derive_roi(recent_roads, buffering_distance = 50000)
+save_roi(ROI)
+
+# ---- Clipping the datasets to the ROI ----
+
+# Function to clip the dataset (will take the dataset as input)
+
+clip_data <- function(data_to_be_clipped) {
+  
+  # Call function to get ROI with 50 km, and save it to disk
+  clip_extent <- ROI
+
 }
