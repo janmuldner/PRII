@@ -1,8 +1,11 @@
-### PRII - Data download script - R ###
+### PRII - Data download script ###
 # Jan Müldner
 # Wageningen University & Research
 # 2026/2027
 # PRII to be set as working directory
+
+
+# This script downlaods the datasets used in the thesis project in their available raw format.
 
 # Load libraries
 library(terra)
@@ -24,7 +27,8 @@ if (!dir.exists("output")){
 
 
 
-# ---- Define URLs of datasets through a named list----
+# ---- DEFINE DATASET URLS ----
+  # ..using a named list
   # This is done to reduce number of global variables
   # see data_sources.md for references of data used
 
@@ -40,9 +44,8 @@ dataset_urls <- list(
 )
 
 
-# ---- Function to download the data using the named list and ROI ----
-# automate it so that it downloads for ROI
-download.datasets <- function(dataset_name, destfile, exdir) {
+# ---- FN: DOWNLOAD DATASETS  ----
+downloadDatasets <- function(dataset_name, destfile, exdir) {
 
 # avoid downloading twice by checking if the desired directory exists (this could also be improved by adding a final_file as a means of checking to prevent empty exdirs being taken as successful downlaod)
   if (!dir.exists(exdir)) {
@@ -60,19 +63,20 @@ download.datasets <- function(dataset_name, destfile, exdir) {
 
 
 
-# ---- Downloading all individual datasets using download.datasets() ----
-  # Unfortunately, this cannot be done per ROI right away, this means that the entire datasets must be acquired in this step
-
+# ---- DOWNLOADING DATASETS ----
 # Road expansion dataset (RRE)
   # Downloads both .shp and .gjson (.shp seems to be faster for processing)
-download.datasets("RRE", "data/rre.zip", "data/road_expansion")
+downloadDatasets("RRE", "data/rre.zip", "data/road_expansion")
 
 # IUCN Red List terrestrial mammals dataset (IUCN_RL)
-  # All years will be obtained
+  # Autumn 2026 changes
+  # 'generlaised' polygon attribute (to hide precise location of threatened taxon, or when data limited)
 
 # Intact Forest Landscapes dataset (IFL)
+  # All years will be obtained
 
 # Area of Habitat mammals dataset 
+  # Might be possible through IUCN now
   # (might have to be split up into multiple steps)
   # writeRaster() could be useful here to write it directly to disk
 
