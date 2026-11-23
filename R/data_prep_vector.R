@@ -13,23 +13,13 @@ library(sf)
 library(terra)
 
 
+
+
 ## FN: LOAD DATA & TRANSFORM CRS ##
+# Reads in dataset and handles reprojection simultaneously
 loadData <- function(file) {
   st_transform(st_read(file), study_crs)
 }
-
-
-
-# Read in downloaded datasets, convert their CRS
-recent_roadss <- loadData("data/road_expansion/forestroads_afr_2019-01_2025-12.shp")
-iucn <- loadData("data/iucn/RQ1_Phase_I.gpkg") # has to be put in data dir manually (IUCN requires registered user)
-ifl_2016 <- loadData("data/ifl/ifl_2016.gpkg")
-ifl_2020 <- loadData("data/ifl/ifl_2020.gpkg")
-ifl_2025 <- loadData("data/ifl/ifl_2025.gpkg")
-concessions <- loadData("data/concessions/OFAC_merged_concessions_no_overlaps_MW_industrial_singlepart_gt1km2.shp")
-
-
-
 
 # ---- FN: CLIP DATASETS TO ROI AND WRITE TO INTERMEDIATE ----
 # Function that clips a dataset to the ROI and writes output as GPKG into intermediate directory.
@@ -39,36 +29,71 @@ clipData <- function(data_to_be_clipped, exfile) {
   # Clip dataset to the extent
   clipped <- st_intersection(data_to_be_clipped, ROI)
 
-  # Save output as GPKG  (intermediate dir)
-  st_write(clipped, paste0(exfile, ".gpkg"), driver = "GPKG", delete_layer = TRUE)
+  # Create dir in between in case some dataset requires one (commented out for now)
+    # (like ifl for IFLs - it will literally construct a new dir in between if needed. Will still work for simple exfile names which are put into intermediate directly)
+    #dirname() does the magic by extracting the path
+  #dir.create(dirname(paste0("intermediate/", exfile)), recursive = TRUE, showWarnings = FALSE)
 
+  # Save output as GPKG (#intermediate dir set)
+  st_write(clipped, paste0("intermediate/", exfile, ".gpkg"), driver = "GPKG", delete_layer = TRUE)
 }
 
 
+
+
+
+
+
+
+## DATA PREPARATION - ALL VECTOR DATASETS ##
+
+# ---- READ IN DATASETS, REPROJECT ----
+recent_roads <- loadData("data/road_expansion/forestroads_afr_2019-01_2025-12.shp")
+concessions <- loadData("data/concessions/OFAC_merged_concessions_no_overlaps_MW_industrial_singlepart_gt1km2.shp")
+ifl_2016 <- loadData("data/ifl/ifl_2016.gpkg")
+ifl_2020 <- loadData("data/ifl/ifl_2020.gpkg")
+ifl_2025 <- loadData("data/ifl/ifl_2025.gpkg")
+iucn <- loadData("data/iucn/RQ1_Phase_I.gpkg") # has to be put in data dir manually (IUCN requires registered user)
+
+
+
 # ---- PREPARING ROAD EXPANSION DATA ----
-clipData(recent_roads, )
+clipData(recent_roads, "forest_roads") # For the recent roads, this is redundant, but still useful if anything changes in the future (CRS and ROI conditions already met)
+
+
+# ---- PREPARING CONCESSION DATA ---- # Concessions do meet CRS and ROI, but contain invalid geometries
+# Repair self-intersecting rings which occur on many of these poylgons
+concessions <- st_make_valid(concessions)
+# Clip & write to int.
+clipData(concessions, "concessions")
+
 
 # ---- PREPARING IFL DATA ----
-clipData(data_to_be_clipped = )
-
-# ---- PREPARING AOH DATA ----
-
-
-
+# Clip each individually to keep them separate (rbind could be used, but unnecessary)
+clipData(ifl_2016, "ifl_2016")
+clipData(ifl_2020, "ifl_2020")
+clipData(ifl_2025, "ifl_2025")
 
 
 # ---- PREPARING IUCN DATA (THREATENED MAMMALS SUBSET) ----
-# Phase II of RQ1
-  # Removing all "presence" polygons other than Extant or Possibly extant (1, 3)
-  # Clipping to ROI
+# (Phase II of RQ1)
 
-# Removing unwanted "presence" categories
-iucn_removed_presence <- iucn[iucn$presence %in% c(1,3), ] # note: this stepped removed 110 rows (multipolygons)
+# Removing all "presence" polygons other than Extant or Possibly extant (1, 3)
+  # initially, Phase I comes with 264 unique species and 994 rows
+iucn_removed_presence <- iucn[iucn$presence %in% c(1,3), ] # note: this step removed 110 rows (multipolygons)
 
-# Clipping to ROI
-threatened_mammals <- clipData(iucn_removed_presence, "intermediate/threatened_mammals")
+# Fix geometries for the IUCN subset (3 self-intersections)
+iucn_valid <- st_make_valid(iucn_removed_presence)
 
-threatened_mammals <- st_read("intermediate/threatened_mammals.gpkg")
+# Clipping to ROI, thus obtaining final subset
+clipData(iucn_valid, "threatened_mammals")
+
+
+
+
+
+
+
 
 # Creating dummy subset with leopard for testing
 leopard_testing <- threatened_mammals[threatened_mammals$sci_name == "Panthera pardus", ]

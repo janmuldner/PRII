@@ -4,12 +4,17 @@
 # 2026/2027
 # PRII to be set as working directory
 
+# It is advised to run line by line.
+
 library(sf)
 library(terra)
 
 # Source scripts
 source("R/data_download.R")
-source("R/data_preparation.R")
+# BEFORE PROCEEDING, FOLLOW STEP X FROM README (otherwise will give an error for missing data)
+
+source("R/data_prep_vector.R.R")
+source("R/data_prep_raster.R")
 
 
 

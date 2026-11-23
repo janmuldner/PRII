@@ -104,3 +104,8 @@ deriveROI <- function() {
 # --- DERIVING & SAVING ROI ---
 # Run the function and have it create a global variable for the ROI (will be used repeatedly) + load ROI globally
 ROI <- deriveROI()
+
+
+
+# ---- CLEANUP -----
+# nothing to remove here globally
