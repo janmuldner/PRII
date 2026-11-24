@@ -24,6 +24,17 @@ congo_countries_vector <- c("Central African Republic", "Cameroon", "Equatorial 
 
 
 
+# Create latitude limits of 6°N and 6°S as rectangle (will later be reused in data_prep_raster)
+# Set a bbox with latitude limits (longitude restrained only to speed up processing)
+lat_bbox <- st_bbox(c(xmin = -20, ymin = -6, xmax = 55, ymax = 6), crs = st_crs(4326))
+
+# Convert that bbox to sf polygon (rectangle)
+latitude_limits <- st_as_sfc(lat_bbox)
+
+
+
+
+
 # --- FN: DERIVE ROI & WRITE TO DISK ---
 # Sources:
   # https://www.rdocumentation.org/packages/rnaturalearth/versions/1.2.0/topics/ne_countries
@@ -51,15 +62,7 @@ deriveROI <- function() {
   }
 
 
-  ## Step 2: Create latitude limits of 6°N and 6°S
-  # Set a bbox with latitude limits (longitude restrained only to speed up processing)
-  lat_bbox <- st_bbox(c(xmin = -20, ymin = -6, xmax = 55, ymax = 6), crs = st_crs(4326))
-  
-  # Convert that bbox to sf polygon
-  latitude_limits <- st_as_sfc(lat_bbox)
-
-
-  ## Step 3: Derive the boundaries of continental Africa
+  ## Step 2: Derive the boundaries of continental Africa
   getAfricanBoundary <- function() {
     
     # Acquire country boundaries of all African countries
@@ -75,7 +78,7 @@ deriveROI <- function() {
   }
 
 
-  ## Step 4: Create ROI
+  ## Step 3: Create ROI
   # Call fn to get Congo countries
   countries <- getGeometryCountries()
 
@@ -108,4 +111,4 @@ ROI <- deriveROI()
 
 
 # ---- CLEANUP -----
-# nothing to remove here globally
+rm(lat_bbox) # the latitude_limits will be reused in a later script

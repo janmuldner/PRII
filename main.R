@@ -11,9 +11,10 @@ library(terra)
 
 # Source scripts
 source("R/data_download.R")
+source("R/getROI.R")
 # BEFORE PROCEEDING, FOLLOW STEP X FROM README (otherwise will give an error for missing data)
 
-source("R/data_prep_vector.R.R")
+source("R/data_prep_vector.R")
 source("R/data_prep_raster.R")
 
 

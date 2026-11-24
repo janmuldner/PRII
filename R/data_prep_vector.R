@@ -1,11 +1,11 @@
-### PRII - Data preparation script ###
+### PRII - Vector data preparation script ###
 # Jan Müldner
 # Wageningen University & Research
 # 2026/2027
 # PRII to be set as working directory
 
-# This script reads in downloaded vector datasets, projected into the study CRS. It clips all datasets to the ROI,
-#  and writes them in the "intermediate" directory in the GPKG format, cleaning global variables.
+# This script reads in downloaded vector datasets, and projects them into the study CRS. It clips all datasets to the 
+# ROI, and writes them in the "intermediate" directory in the GPKG format, cleaning global variables.
 
 
 # Load packages
@@ -96,18 +96,25 @@ clipData(iucn_valid, "threatened_mammals")
 
 
 # Creating dummy subset with leopard for testing
-leopard_testing <- threatened_mammals[threatened_mammals$sci_name == "Panthera pardus", ]
-plot(leopard_testing)
-nrow(leopard_testing)
-st_write(leopard_testing, "intermediate/test.gpkg", driver = "GPKG", delete_layer = TRUE)
+#leopard_testing <- threatened_mammals[threatened_mammals$sci_name == "Panthera pardus", ]
+#plot(leopard_testing)
+#nrow(leopard_testing)
+#st_write(leopard_testing, "intermediate/test.gpkg", driver = "GPKG", delete_layer = TRUE)
 
-leopard_aoh <- rast("data/Panthera_pardus.tif")
-leopard_aoh <- project(leopard_aoh, study_crs)
-leopard_aoh_clipped <- crop(leopard_aoh, ROI)
+#leopard_aoh <- rast("data/Panthera_pardus.tif")
+#leopard_aoh <- project(leopard_aoh, study_crs)
+#leopard_aoh_clipped <- crop(leopard_aoh, ROI)
 
 
 
 
 
 # ---- CLEANUP -----
+rm(recent_roads) # all loaded datasets before clipData
+rm(concessions)
+rm(ifl_2016)
+rm(ifl_2020)
+rm(ifl_2025)
+rm(iucn)
 rm(iucn_removed_presence) # only used for obtaining Threatened Mammals from phase I
+rm(iucn_valid)
